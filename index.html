@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>LAE: Latent Activation Editing for Safer Multirobot Navigation</title>
+
+    <!-- Bulma + template CSS (already in repo) -->
+    <link rel="stylesheet" href="./static/css/bulma.min.css" />
+    <link rel="stylesheet" href="./static/css/bulma-carousel.min.css" />
+    <link rel="stylesheet" href="./static/css/bulma-slider.min.css" />
+    <link rel="stylesheet" href="./static/css/fontawesome.all.min.css" />
+    <link rel="stylesheet" href="./static/css/index.css" />
+
+    <script defer src="./static/js/fontawesome.all.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script defer src="./static/js/bulma-carousel.min.js"></script>
+    <script defer src="./static/js/bulma-slider.min.js"></script>
+    <script defer src="./static/js/index.js"></script>
+  </head>
+
+  <body>
+    <!-- Title -->
+    <section class="hero">
+      <div class="hero-body">
+        <div class="container is-max-desktop">
+          <div class="columns is-centered">
+            <div class="column has-text-centered">
+              <h1 class="title is-1 publication-title">
+                Latent Activation Editing: Inference-Time Refinement of Learned Policies for Safer Multirobot Navigation
+              </h1>
+
+              <div class="is-size-5 publication-authors">
+                <!-- TODO: verify author order/spelling -->
+                <span class="author-block">Satyajeet Das<sup>1</sup>,</span>
+                <span class="author-block">Darren Chiu<sup>1</sup>,</span>
+                <span class="author-block">Zhehui Huang<sup>1</sup>,</span>
+                <span class="author-block">Lars Lindemann<sup>2</sup>,</span>
+                <span class="author-block">Gaurav S. Sukhatme<sup>1</sup></span>
+              </div>
+
+              <div class="is-size-5 publication-authors">
+                <span class="author-block"><sup>1</sup>University of Southern California</span> &nbsp;&nbsp;
+                <span class="author-block"><sup>2</sup>ETH Zürich</span>
+              </div>
+
+              <div class="column has-text-centered">
+                <div class="publication-links">
+                  <!-- Paper (local) -->
+                  <span class="link-block">
+                    <a href="https://arxiv.org/abs/2509.20623" class="external-link button is-normal is-rounded is-dark" target="_blank">
+                      <span class="icon"><i class="fas fa-file-pdf"></i></span>
+                      <span>Paper (PDF)</span>
+                    </a>
+                  </span>
+
+                  <!-- arXiv (optional) -->
+                  <span class="link-block">
+                    <!-- TODO: replace with actual arXiv URL (or remove this button) -->
+                    <a href="https://arxiv.org/abs/2509.20623" class="external-link button is-normal is-rounded is-dark" target="_blank">
+                      <span class="icon"><i class="fas fa-link"></i></span>
+                      <span>Paper (arXiv)</span>
+                    </a>
+                  </span>
+
+                  <!-- Code -->
+                  <span class="link-block">
+                    <!-- TODO: replace with actual code repo -->
+                    <a href="https://github.com/lae-robotics/LAE" class="external-link button is-normal is-rounded is-dark" target="_blank">
+                      <span class="icon"><i class="fab fa-github"></i></span>
+                      <span>Code</span>
+                    </a>
+                  </span>
+
+                  <!-- Video -->
+                  <span class="link-block">
+                    <!-- If you embed MP4s below, you can also keep this as an anchor -->
+                    <a href="#videos" class="external-link button is-normal is-rounded is-dark">
+                      <span class="icon"><i class="fas fa-video"></i></span>
+                      <span>Videos</span>
+                    </a>
+                  </span>
+
+                  <!-- BibTeX anchor -->
+                  <span class="link-block">
+                    <a href="#bibtex" class="external-link button is-normal is-rounded is-dark">
+                      <span class="icon"><i class="fas fa-quote-right"></i></span>
+                      <span>BibTeX</span>
+                    </a>
+                  </span>
+                </div>
+              </div>
+
+              <!-- <p class="is-size-5" style="margin-top: 0.75rem;">
+                Inference-time safety refinement for frozen robot policies via targeted latent activation edits.
+              </p> -->
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Teaser -->
+<section class="hero teaser">
+  <div class="container is-max-desktop">
+    <div class="hero-body">
+
+      <figure class="image">
+        <img src="media/Image/Hero_Fig.png"
+             style="width:100%; border-radius:8px;"
+             alt="LAE teaser figure">
+      </figure>
+
+      <p class="has-text-centered"
+         style="margin-top:1rem; line-height:1.6; font-size:1.05rem;">
+
+        <b>(a) Conceptual overview of LAE.</b>
+        A behavior classifier monitors the intermediate latent activation <i>Z</i> of a frozen RL policy.
+        Safe activations pass unchanged, while unsafe ones are replaced with edited surrogates <i>Z′</i>
+        generated by the activation editing module, without modifying policy weights.
+
+        <br><br>
+
+        <b>(b) Real-world quadrotor navigation.</b>
+        Without LAE, the RL policy collides with an obstacle. With LAE, the trajectory follows the
+        base policy until the first unsafe flag, after which successive latent edits steer the
+        quadrotor away from the unsafe zone, enabling it to reach the goal safely.
+
+      </p>
+
+    </div>
+  </div>
+</section>
+
+    <!-- Abstract -->
+    <section class="section">
+      <div class="container is-max-desktop">
+        <div class="columns is-centered">
+          <div class="column">
+            <h2 class="title is-3">Abstract</h2>
+            <div class="content has-text-justified">
+              <p>
+                Reinforcement learning has enabled significant progress in complex domains such as coordinating and navigating multiple quadrotors. 
+                However, even well-trained policies remain vulnerable to collisions in obstacle-rich environments. 
+                Addressing these infrequent but critical safety failures through retraining or fine-tuning is costly and risks degrading previously learned skills. 
+                Inspired by activation steering in large language models and latent editing in computer vision, we introduce a framework for inference-time <b>Latent Activation Editing (LAE)</b> that refines the behavior of pre-trained policies without modifying their weights or architecture. 
+                The framework operates in two stages: (i) an online classifier monitors intermediate activations to detect states associated with undesired behaviors, and (ii) an activation editing module that selectively modifies flagged activations to shift the policy towards safer regimes. In this work, we focus on improving safety in multi-quadrotor navigation. 
+                We hypothesize that amplifying a policy's internal perception of risk can induce safer behaviors. We instantiate this idea through a latent collision world model trained to predict future pre-collision activations, thereby prompting earlier and more cautious avoidance responses. 
+                Extensive simulations and real-world Crazyflie experiments demonstrate that LAE achieves statistically significant reduction in collisions (nearly 90% fewer cumulative collisions compared to the unedited baseline) and substantially increases the fraction of collision-free trajectories, while preserving task completion. 
+                More broadly, our results establish LAE as a lightweight paradigm, feasible on resource-constrained hardware, for post-deployment refinement of learned robot policies.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Method Overview -->
+    <section class="section" id="method">
+      <div class="container is-max-desktop">
+        <div class="columns is-centered">
+          <div class="column">
+            <h2 class="title is-3">Method Overview</h2>
+
+            <div class="content has-text-justified">
+              <!-- <p>
+                <b>LAE</b> is a plug-in safety layer that intervenes at a chosen intermediate latent representation <code>Z_t</code> inside a frozen policy.
+                A lightweight behavior classifier flags unsafe latents (e.g., low time-to-collision). When unsafe, an editor replaces <code>Z_t</code> with an
+                edited surrogate <code>Z'_t</code>, after which the policy continues forward normally.
+                Our strongest instantiation uses a <b>Latent Collision World Model (LCWM)</b> to predict collision-related future latents from a short history buffer.
+              </p> -->
+              <p>
+              <b>Latent Activation Editing (LAE)</b> is an inference-time safety layer that intervenes at a chosen
+              intermediate latent representation <i>Z<sub>t</sub></i> inside a frozen reinforcement learning policy.
+              A lightweight behavior classifier continuously monitors these activations and detects states
+              associated with unsafe behavior. When an unsafe latent is detected,
+              LAE replaces <i>Z<sub>t</sub></i> with an edited surrogate activation <i>Z<sub>t</sub>′</i>, after which the policy
+              continues forward normally without any modification to its weights.
+              </p>
+
+              <p>
+              In our implementation, the editor is realized using a
+              <b>Latent Collision World Model (LCWM)</b>, which predicts future collision-related latent activations
+              from a short history buffer. By amplifying the policy’s internal perception of risk, the edited
+              latent encourages earlier and safer avoidance maneuvers while preserving the policy’s original
+              goal-directed behavior.
+              </p>
+
+              <!-- TODO: replace with LAE pipeline figure
+              <figure class="image" style="margin-top: 1.5rem; margin-bottom: 1.5rem;">
+                <img src="media/ImageMethod_Fig.png" alt="LAE overview (replace media/fig_lae_overview.png)">
+                <figcaption class="has-text-grey has-text-centered" style="margin-top: 0.5rem; font-size: 0.95rem;">
+                  <b>LAE pipeline.</b> Safe latents pass through unchanged; unsafe latents are edited at inference-time without changing weights.
+                </figcaption>
+              </figure> -->
+              <figure class="image"
+                      style="margin-top:1.5rem; margin-bottom:1.5rem; text-align:center;">
+                <img src="media/Image/Method_Fig.png"
+                    alt="Overview of LAE integrated with a pre-trained multi-quadrotor navigation policy"
+                    style="height:auto; margin:auto; display:block;">
+
+                <figcaption class="has-text-grey has-text-centered" style="margin-top: 0.5rem; font-size: 0.95rem;">
+
+                  <b>Overview of LAE integrated on a pre-trained multi-quadrotor navigation policy.</b>
+                                    <br><br>
+
+                  <b>(a) RL policy architecture:</b> observations are encoded and fused via multi-head attention
+                  to produce intermediate latent activations (<i>Z¹</i>, <i>Z²</i>), which serve as candidates for
+                  <i>Z<sub>t</sub></i>.
+                  <br><br>
+                  <b>(b) Editing pipeline:</b> a behavior classifier evaluates latent activation
+                  <i>Z<sub>t</sub></i> and forwards it unchanged if safe, or routes it to the editing module if
+                  unsafe. The module maintains a short history buffer and, once filled, invokes the
+                  <b>LCWM</b> to generate a surrogate <i>Z<sub>t</sub>′</i> that replaces the unsafe latent activation
+                  <i>Z<sub>t</sub></i>.
+                </figcaption>
+              </figure>
+
+              <!-- Optional bullets -->
+              <ul style="margin-top: 1rem;">
+                <li><b>No retraining</b>: policy weights remain frozen; edits occur only at inference-time.</li>
+                <li><b>Selective intervention</b>: trajectories match the base policy until an unsafe latent is detected.</li>
+                <li><b>Modular & reversible</b>: the editor can be enabled/disabled without re-optimizing the policy.</li>
+              </ul>
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Results -->
+    <section class="section" id="results">
+      <div class="container is-max-desktop">
+        <div class="columns is-centered">
+          <div class="column">
+            <h2 class="title is-3">Simulation Results</h2>
+
+            <div class="content has-text-justified">
+              <p>
+                We evaluate LAE in large-scale simulation and real-world Crazyflie experiments in obstacle-rich indoor environments.
+                LAE substantially reduces collisions while preserving task success, and maintains identical behavior to the base policy in safe regions.
+              </p>
+
+              <!-- TODO: replace with your main quantitative figure -->
+              <figure class="image" style="margin-top: 1.5rem; margin-bottom: 1.5rem;">
+                <img src="media/Image/Result_1.png" alt="Results (replace media/fig_results.png)">
+                <figcaption>
+                  Quantitative comparison of the base RL policy with and without LAE on 2,600 environmental configurations. We report total collisions, zero collision trajectories, and average success rate.               
+                </figcaption>
+              </figure>
+
+              <div class="columns is-centered">
+                <div class="column is-half">
+                  <figure class="media-block">
+                    <video class="media"
+                          autoplay 
+                          controls
+                          playsinline
+                          muted
+                          loop
+                          preload="metadata">
+                      <source src="media/videos/sim_noedit.mp4" type="video/mp4" />
+                    </video>
+                    <figcaption>
+                      <b>No LAE (Base RL Policy).</b>
+                    </figcaption>
+                  </figure>
+                </div>
+
+                <div class="column is-half">
+                  <figure class="media-block">
+                    <video class="media"
+                          autoplay 
+                          controls
+                          playsinline
+                          muted
+                          loop
+                          preload="metadata">
+                      <source src="media/videos/sim_lae_final_1.mp4" type="video/mp4" />
+                    </video>
+                    <figcaption>
+                      <b>With LAE (RL Policy + LAE).</b> 
+                    </figcaption>
+                  </figure>
+                </div>
+              </div>
+
+              <!-- TODO: optional real-world figure -->
+              <figure class="image" style="margin-top: 1.5rem; margin-bottom: 1.5rem;">
+                <img src="media/Image/Traj2.png" alt="Results (replace media/fig_results.png)">
+                <figcaption>
+                  Representative trajectory comparison. 
+                  <b>Left</b>: base RL policy (no LAE), which collides with obstacles. <b>Right</b>: RL policy with LAE, which avoids collisions while remaining identical to the base policy in safe regions and still reaching the goals. 
+                  Trajectories are coloured by speed. Numbers denote quadrotor index.                
+                </figcaption>
+              </figure>
+
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Videos -->
+    <section class="section" id="videos">
+      <div class="container is-max-desktop">
+        <h2 class="title is-3">Real-World Videos</h2>
+        
+        <h3 class="subtitle is-5 has-text-centered" style="margin-top:1rem; margin-bottom:1rem;">
+          <b>Real-World Experiment: Multi-Drone Bilateral Crossing Task</b>
+        </h3>
+
+            <div class="columns is-centered">
+                <div class="column is-half">
+                  <figure class="media-block">
+                    <video class="media"
+                          autoplay 
+                          controls
+                          playsinline
+                          muted
+                          loop
+                          preload="metadata">
+                      <source src="media/videos/1_rl_small.mp4" type="video/mp4" />
+                    </video>
+                    <figcaption>
+                      <b>No LAE (Base RL Policy).</b>
+                    </figcaption>
+                  </figure>
+                </div>
+
+                <div class="column is-half">
+                  <figure class="media-block">
+                    <video class="media"
+                          autoplay 
+                          controls
+                          playsinline
+                          muted
+                          loop
+                          preload="metadata">
+                      <source src="media/videos/1_lae_small.mp4" type="video/mp4" />
+                    </video>
+                    <figcaption>
+                      <b>With LAE (RL Policy + LAE).</b> 
+                    </figcaption>
+                  </figure>
+                </div>
+            </div>
+            <h3 class="subtitle is-5 has-text-centered" style="margin-top:1rem; margin-bottom:1rem;">
+          <b>Real World Experiment: Multi-Drone Four-Way Crossing Task</b>
+        </h3>
+
+            <div class="columns is-centered">
+                <div class="column is-half">
+                  <figure class="media-block">
+                    <video class="media"
+                          autoplay 
+                          controls
+                          playsinline
+                          muted
+                          loop
+                          preload="metadata">
+                      <source src="media/videos/2_rl_small.mp4" type="video/mp4" />
+                    </video>
+                    <figcaption>
+                      <b>No LAE (Base RL Policy).</b>
+                    </figcaption>
+                  </figure>
+                </div>
+
+                <div class="column is-half">
+                  <figure class="media-block">
+                    <video class="media"
+                          autoplay 
+                          controls
+                          playsinline
+                          muted
+                          loop
+                          preload="metadata">
+                      <source src="media/videos/2_lae_small.mp4" type="video/mp4" />
+                    </video>
+                    <figcaption>
+                      <b>With LAE (RL Policy + LAE).</b> 
+                    </figcaption>
+                  </figure>
+                </div>
+            </div>
+
+    <!-- BibTeX -->
+<section class="section" id="bibtex">
+  <div class="container is-max-desktop content">
+    <h2 class="title">BibTeX</h2>
+    <pre><code>@misc{das2025latentactivationeditinginferencetime,
+  title={Latent Activation Editing: Inference-Time Refinement of Learned Policies for Safer Multirobot Navigation},
+  author={Satyajeet Das and Darren Chiu and Zhehui Huang and Lars Lindemann and Gaurav S. Sukhatme},
+  year={2025},
+  eprint={2509.20623},
+  archivePrefix={arXiv},
+  primaryClass={cs.RO},
+  url={https://arxiv.org/abs/2509.20623}
+}</code></pre>
+  </div>
+</section>
+
+    <footer class="footer">
+      <div class="container">
+        <div class="content has-text-centered">
+          <p class="has-text-grey">
+            Simple project-page template adapted from an academic project-page layout (Bulma-based).
+          </p>
+        </div>
+      </div>
+    </footer>
+  </body>
+</html>
